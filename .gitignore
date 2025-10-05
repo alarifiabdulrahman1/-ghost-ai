@@ -1,0 +1,5 @@
+ghost_memory/
+ghost_profile.json
+.env
+__pycache__/
+*.pyc

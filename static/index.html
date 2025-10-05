@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👻 Ghost AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #0a0a0a;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #e0e0e0;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1000px;
+            height: 92vh;
+            background: #1a1a1a;
+            border-radius: 16px;
+            border: 1px solid #2a2a2a;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: #1a1a1a;
+            border-bottom: 1px solid #2a2a2a;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 22px;
+            font-weight: 500;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ghost-icon {
+            font-size: 24px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .stats {
+            display: flex;
+            gap: 25px;
+            font-size: 13px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .stat-label {
+            color: #888;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .chat-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-container::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb:hover {
+            background: #444;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            order: 2;
+        }
+
+        .message-content {
+            max-width: 65%;
+            padding: 14px 18px;
+            border-radius: 12px;
+            line-height: 1.6;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-content {
+            background: #2a2a2a;
+            color: #ffffff;
+            border: 1px solid #333;
+        }
+
+        .message.ghost .message-content {
+            background: #1f1f1f;
+            color: #e0e0e0;
+            border: 1px solid #2a2a2a;
+        }
+
+        .rating-container {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #2a2a2a;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .rating-label {
+            font-size: 11px;
+            color: #666;
+            margin-right: 4px;
+        }
+
+        .rating-btn {
+            background: transparent;
+            border: 1px solid #2a2a2a;
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #888;
+            transition: all 0.2s;
+        }
+
+        .rating-btn:hover {
+            background: #2a2a2a;
+            border-color: #444;
+            color: #fff;
+        }
+
+        .input-container {
+            padding: 20px 30px;
+            background: #1a1a1a;
+            border-top: 1px solid #2a2a2a;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        #messageInput {
+            flex: 1;
+            padding: 14px 20px;
+            background: #0a0a0a;
+            border: 1px solid #2a2a2a;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #e0e0e0;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+
+        #messageInput:focus {
+            border-color: #444;
+        }
+
+        #messageInput::placeholder {
+            color: #555;
+        }
+
+        #sendBtn {
+            padding: 14px 28px;
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        #sendBtn:hover {
+            background: #e0e0e0;
+        }
+
+        #sendBtn:active {
+            transform: scale(0.98);
+        }
+
+        #sendBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 14px 18px;
+            background: #1f1f1f;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            width: fit-content;
+        }
+
+        .typing-indicator.active {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #666;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                opacity: 0.3;
+                transform: translateY(0);
+            }
+            30% {
+                opacity: 1;
+                transform: translateY(-4px);
+            }
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .welcome-message h2 {
+            color: #ffffff;
+            margin-bottom: 12px;
+            font-weight: 500;
+            font-size: 24px;
+        }
+
+        .welcome-message p {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+                border: none;
+            }
+
+            .header {
+                padding: 16px 20px;
+            }
+
+            .stats {
+                display: none;
+            }
+
+            .chat-container {
+                padding: 20px;
+            }
+
+            .message-content {
+                max-width: 80%;
+            }
+
+            .input-container {
+                padding: 16px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1>
+                    <span class="ghost-icon">👻</span>
+                    Ghost
+                </h1>
+            </div>
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-value" id="totalChats">0</span>
+                    <span class="stat-label">chats</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="totalMemories">0</span>
+                    <span class="stat-label">memories</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="totalInsights">0</span>
+                    <span class="stat-label">insights</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="welcome-message">
+                <h2>Welcome to Ghost</h2>
+                <p>Your self-improving AI assistant</p>
+                <p>I remember everything and get smarter with every conversation</p>
+            </div>
+        </div>
+
+        <div class="input-container">
+            <input 
+                type="text" 
+                id="messageInput" 
+                placeholder="Message Ghost..." 
+                autocomplete="off"
+            />
+            <button id="sendBtn">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chatContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const sessionId = 'session_' + Date.now();
+
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const stats = await response.json();
+                
+                document.getElementById('totalChats').textContent = stats.total_conversations || stats.total_interactions || 0;
+                document.getElementById('totalMemories').textContent = stats.stored_memories || stats.stored_conversations || 0;
+                document.getElementById('totalInsights').textContent = stats.learned_insights || stats.stored_knowledge || 0;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        function addMessage(content, isUser = false) {
+            const welcomeMsg = chatContainer.querySelector('.welcome-message');
+            if (welcomeMsg) {
+                welcomeMsg.remove();
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'ghost'}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = isUser ? '👤' : '👻';
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.textContent = content;
+            
+            if (!isUser) {
+                const ratingDiv = document.createElement('div');
+                ratingDiv.className = 'rating-container';
+                ratingDiv.innerHTML = `
+                    <span class="rating-label">Rate:</span>
+                    ${[1, 2, 3, 4, 5].map(rating => 
+                        `<button class="rating-btn" onclick="rateResponse(${rating})">${'⭐'.repeat(rating)}</button>`
+                    ).join('')}
+                `;
+                contentDiv.appendChild(ratingDiv);
+            }
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(contentDiv);
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function showTyping() {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message ghost';
+            messageDiv.id = 'typingMessage';
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = '👻';
+            
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator active';
+            typingDiv.innerHTML = '<span></span><span></span><span></span>';
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(typingDiv);
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function hideTyping() {
+            const typing = document.getElementById('typingMessage');
+            if (typing) typing.remove();
+        }
+
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            addMessage(message, true);
+            messageInput.value = '';
+            sendBtn.disabled = true;
+            showTyping();
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        session_id: sessionId
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    hideTyping();
+                    addMessage(data.response, false);
+                    loadStats();
+                } else {
+                    hideTyping();
+                    addMessage('Error: ' + (data.error || 'Unknown error'), false);
+                }
+            } catch (error) {
+                hideTyping();
+                addMessage('Could not connect to Ghost. Check if server is running.', false);
+                console.error('Error:', error);
+            }
+
+            sendBtn.disabled = false;
+            messageInput.focus();
+        }
+
+        async function rateResponse(rating) {
+            try {
+                const response = await fetch('/api/rate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        rating: rating,
+                        session_id: sessionId
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    const tempMsg = document.createElement('div');
+                    tempMsg.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #2a2a2a; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 13px; z-index: 1000;';
+                    tempMsg.textContent = `✓ ${data.message}`;
+                    document.body.appendChild(tempMsg);
+                    setTimeout(() => tempMsg.remove(), 2000);
+                    loadStats();
+                }
+            } catch (error) {
+                console.error('Error rating:', error);
+            }
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        loadStats();
+        messageInput.focus();
+    </script>
+</body>
+</html>

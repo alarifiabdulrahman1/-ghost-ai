@@ -1,0 +1,1 @@
+web: gunicorn ghost_web:app
